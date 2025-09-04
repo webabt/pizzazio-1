@@ -1,19 +1,25 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useEffect, useState, useRef } from "react"
-import Lenis from "@studio-freight/lenis"
 
-import { HeroSection } from "@/components/hero-section"
-import { PizzaRotation } from "@/components/pizza-rotation"
-import { HorizontalScrollSection } from "@/components/horizontal-scroll-section"
-import { ParallaxCards } from "@/components/cards-parallax"
-import { HorizontalSection } from "@/components/horizontal-section"
-import { FooterSection } from "@/components/footer-section"
+// Dynamically import components that use window
+const HeroSection = dynamic(() => import("@/components/hero-section").then(mod => ({ default: mod.HeroSection })), { ssr: false })
+const PizzaRotation = dynamic(() => import("@/components/pizza-rotation").then(mod => ({ default: mod.PizzaRotation })), { ssr: false })
+const HorizontalScrollSection = dynamic(() => import("@/components/horizontal-scroll-section").then(mod => ({ default: mod.HorizontalScrollSection })), { ssr: false })
+const ParallaxCards = dynamic(() => import("@/components/cards-parallax").then(mod => ({ default: mod.ParallaxCards })), { ssr: false })
+const HorizontalSection = dynamic(() => import("@/components/horizontal-section").then(mod => ({ default: mod.HorizontalSection })), { ssr: false })
+const FooterSection = dynamic(() => import("@/components/footer-section").then(mod => ({ default: mod.FooterSection })), { ssr: false })
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
+  const [isClient, setIsClient] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
   const curtainRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
     // Check if we're on the client side
@@ -40,16 +46,6 @@ export default function Home() {
     // Call handler right away to update initial position
     handleScroll()
 
-    // Initialize Lenis for smooth scrolling
-    const lenis = new Lenis()
-
-    function raf(time: number) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
-
-    requestAnimationFrame(raf)
-
     // Remove event listener on cleanup
     return () => {
       window.removeEventListener("scroll", handleScroll)
@@ -62,6 +58,22 @@ export default function Home() {
     if (menuSection) {
       menuSection.scrollIntoView({ behavior: "smooth" })
     }
+  }
+
+  // Show loading state during hydration
+  if (!isClient) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <main className="flex-1 bg-[#F9F1E4]">
+          <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#5C0606] mx-auto"></div>
+              <p className="mt-4 text-[#5C0606] text-lg">Lade Pizzeria...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
