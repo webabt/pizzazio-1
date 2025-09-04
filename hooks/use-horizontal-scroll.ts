@@ -167,6 +167,8 @@ export function useResponsiveDimensions(): Dimensions {
 
   // Update dimensions on mount and resize
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     calculateDimensions()
 
     const handleResize = () => {
@@ -361,7 +363,7 @@ export function useHorizontalScroll(
       ctx = gsap.context(() => {
         // Get container width after reset
         const containerWidth = container.scrollWidth
-        const viewportWidth = window.innerWidth
+        const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920
         const scrollDistance = containerWidth - viewportWidth
 
         console.log("Container width:", containerWidth)
@@ -400,8 +402,8 @@ export function useHorizontalScroll(
 
           // Simplified calculations
           const initialSize = Math.max(150, dimensions.lifestyleFontSize * 2)
-          const finalWidth = window.innerWidth
-          const finalHeight = window.innerHeight
+          const finalWidth = typeof window !== 'undefined' ? window.innerWidth : 1920
+          const finalHeight = typeof window !== 'undefined' ? window.innerHeight : 1080
 
           // Interpolate mask size with optimized calculations
           const maskWidth = gsap.utils.interpolate(initialSize, finalWidth, smoothProgress)
@@ -411,8 +413,8 @@ export function useHorizontalScroll(
           const borderRadius = gsap.utils.interpolate(initialSize / 2, 0, smoothProgress)
 
           // Calculate inset values
-          const insetTop = (100 - (maskHeight / window.innerHeight) * 100) / 2
-          const insetRight = (100 - (maskWidth / window.innerWidth) * 100) / 2
+          const insetTop = (100 - (maskHeight / finalHeight) * 100) / 2
+          const insetRight = (100 - (maskWidth / finalWidth) * 100) / 2
 
           // Apply mask with requestAnimationFrame for smoother updates
           requestAnimationFrame(() => {
@@ -568,7 +570,9 @@ export function useHorizontalScroll(
     const timer = setTimeout(initScrollTrigger, 500)
 
     // Add resize listener
-    window.addEventListener("resize", handleResize)
+    if (typeof window !== 'undefined') {
+      window.addEventListener("resize", handleResize)
+    }
 
     return () => {
       clearTimeout(timer)
@@ -581,7 +585,9 @@ export function useHorizontalScroll(
       if (ctx) {
         ctx.revert()
       }
-      window.removeEventListener("resize", handleResize)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener("resize", handleResize)
+      }
     }
   }, [gsapLoaded, dimensions, stickerConfigurations])
 }
