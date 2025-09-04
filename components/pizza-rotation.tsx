@@ -150,6 +150,8 @@ export function PizzaRotation() {
   }
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const handleScroll = () => {
       const scrollPosition = window.scrollY
 

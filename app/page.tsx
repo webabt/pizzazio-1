@@ -16,6 +16,9 @@ export default function Home() {
   const curtainRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // Check if we're on the client side
+    if (typeof window === 'undefined') return
+
     const handleScroll = () => {
       const scrollTop = window.pageYOffset
       setScrollY(scrollTop)
@@ -54,6 +57,7 @@ export default function Home() {
   }, [])
 
   const scrollToMenu = () => {
+    if (typeof window === 'undefined') return
     const menuSection = document.getElementById("menu")
     if (menuSection) {
       menuSection.scrollIntoView({ behavior: "smooth" })

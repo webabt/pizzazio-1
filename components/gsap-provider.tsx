@@ -28,7 +28,7 @@ export function GSAPProvider({ children }: { children: React.ReactNode }) {
         onLoad={() => {
           console.log("ScrollTrigger loaded successfully")
           setScrollTriggerLoaded(true)
-          if (window.gsap && window.ScrollTrigger) {
+          if (typeof window !== 'undefined' && window.gsap && window.ScrollTrigger) {
             window.gsap.registerPlugin(window.ScrollTrigger)
             console.log("ScrollTrigger registered with GSAP")
           }
